@@ -1,0 +1,347 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora TCO</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', sans-serif;
+      background-color: #121212;
+      color: #FFFFFF;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 30px;
+    }
+
+    .modelos {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 767px) {
+      .modelos {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .section {
+      background-color: #1E1E1E;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    h1, h2 {
+      margin-top: 0;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #CCCCCC;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="range"],
+    select {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background-color: #2A2A2A;
+      color: #FFFFFF;
+      margin-bottom: 15px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      background-color: #E30613;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #B00510;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="pagina1">
+    <h1>Calculadora de Ahorro TCO</h1>
+    <form id="tcoForm">
+      <div class="modelos">
+        <div class="section">
+          <h2>Modelo 1</h2>
+          <label for="modelo1">Modelo:</label>
+          <select id="modelo1"></select>
+          <label for="acabado1">Acabado:</label>
+          <select id="acabado1"></select>
+          <label for="motor1">Motor:</label>
+          <select id="motor1"></select>
+          <label for="cuota1">Cuota mensual (€):</label>
+          <input type="number" id="cuota1" required>
+        </div>
+
+        <div class="section">
+          <h2>Modelo 2</h2>
+          <label for="modelo2">Modelo:</label>
+          <select id="modelo2"></select>
+          <label for="acabado2">Acabado:</label>
+          <select id="acabado2"></select>
+          <label for="motor2">Motor:</label>
+          <select id="motor2"></select>
+          <label for="cuota2">Cuota mensual (€):</label>
+          <input type="number" id="cuota2" required>
+        </div>
+      </div>
+
+      <div class="section">
+        <label for="kmsSemana">Kilómetros por semana:</label>
+        <input type="number" id="kmsSemana" required>
+
+        <label for="cargasSemana">Cargas por semana:</label>
+        <input type="range" id="cargasSemana" min="1" max="7" value="4" required>
+
+        <label for="cargasGratis">Cargas gratis por semana:</label>
+        <input type="range" id="cargasGratis" min="1" max="7" value="1" required>
+
+        <label for="precioCombustible">Precio combustible (€):</label>
+        <input type="number" step="0.01" id="precioCombustible" required>
+
+        <label for="precioKwh">Precio kWh (€):</label>
+        <input type="number" step="0.01" id="precioKwh" required>
+      </div>
+
+      <div class="buttons">
+        <button type="submit">Calcular</button>
+        <button type="reset">Reset</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="container" id="pagina2">
+    <h1>Comparativa de Resultados</h1>
+    <div class="section" style="text-align:center;">
+      <h2>Kms mensuales:</h2>
+      <p id="resKmsMensuales" style="font-size: 20px; color: #E30613; font-weight: bold;"></p>
+      <h2>Ahorro mensual estimado:</h2>
+      <p id="resAhorro" style="font-size: 20px; color: #E30613; font-weight: bold;"></p>
+    </div>
+    <div class="modelos">
+      <div class="section">
+        <h2>Modelo 1</h2>
+        <p><strong>Modelo:</strong> <span id="resModelo1"></span></p>
+        <p><strong>Cuota Mensual:</strong> <span id="resCuota1"></span></p>
+        <p><strong>Coste de Uso:</strong> <span id="resCosto1"></span></p>
+        <p><strong>Coste Real Mensual:</strong> <span id="resTCO1"></span></p>
+        <button onclick="toggleDetails('details1')">Más detalles</button>
+        <div id="details1" class="hidden">
+          <p><strong>kms en modo ICE:</strong> <span id="resKmsICE1"></span></p>
+          <p><strong>kms en modo BEV:</strong> <span id="resKmsBEV1"></span></p>
+          <p><strong>Precio electricidad:</strong> <span id="resPrecioElect1"></span></p>
+          <p><strong>Precio combustible:</strong> <span id="resPrecioComb1"></span></p>
+          <p><strong>Coste mensual combustible:</strong> <span id="resCostoComb1"></span></p>
+          <p><strong>Coste mensual electricidad:</strong> <span id="resCostoElect1"></span></p>
+        </div>
+      </div>
+      <div class="section">
+        <h2>Modelo 2</h2>
+        <p><strong>Modelo:</strong> <span id="resModelo2"></span></p>
+        <p><strong>Cuota Mensual:</strong> <span id="resCuota2"></span></p>
+        <p><strong>Coste de Uso:</strong> <span id="resCosto2"></span></p>
+        <p><strong>Coste Real Mensual:</strong> <span id="resTCO2"></span></p>
+        <button onclick="toggleDetails('details2')">Más detalles</button>
+        <div id="details2" class="hidden">
+          <p><strong>kms en modo ICE:</strong> <span id="resKmsICE2"></span></p>
+          <p><strong>kms en modo BEV:</strong> <span id="resKmsBEV2"></span></p>
+          <p><strong>Precio electricidad:</strong> <span id="resPrecioElect2"></span></p>
+          <p><strong>Precio combustible:</strong> <span id="resPrecioComb2"></span></p>
+          <p><strong>Coste mensual combustible:</strong> <span id="resCostoComb2"></span></p>
+          <p><strong>Coste mensual electricidad:</strong> <span id="resCostoElect2"></span></p>
+        </div>
+      </div>
+    </div>
+    <div class="section" style="text-align:center;">
+      <button onclick="volverPagina1()">Volver</button>
+    </div>
+  </div>
+
+  <script>
+    function volverPagina1() {
+      document.getElementById('pagina2').classList.add('hidden');
+      document.getElementById('pagina1').classList.remove('hidden');
+    }
+
+    function toggleDetails(id) {
+      const details = document.getElementById(id);
+      if (details.classList.contains('hidden')) {
+        details.classList.remove('hidden');
+      } else {
+        details.classList.add('hidden');
+      }
+    }
+
+    document.getElementById('tcoForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const cuota1 = parseFloat(document.getElementById('cuota1').value);
+      const cuota2 = parseFloat(document.getElementById('cuota2').value);
+      const kmsSemana = parseFloat(document.getElementById('kmsSemana').value);
+      const cargasSemana = parseInt(document.getElementById('cargasSemana').value);
+      const cargasGratis = parseInt(document.getElementById('cargasGratis').value);
+      const precioCombustible = parseFloat(document.getElementById('precioCombustible').value);
+      const precioKwh = parseFloat(document.getElementById('precioKwh').value);
+
+      const modelo1 = document.getElementById('modelo1').value;
+      const acabado1 = document.getElementById('acabado1').value;
+      const motor1 = document.getElementById('motor1').value;
+
+      const modelo2 = document.getElementById('modelo2').value;
+      const acabado2 = document.getElementById('acabado2').value;
+      const motor2 = document.getElementById('motor2').value;
+
+      const consumoCombustible = 0.06;
+      const consumoElectrico = 0.15;
+      const semanasPorMes = 4;
+
+      const costeMensual1 = cuota1 + (kmsSemana * consumoCombustible * precioCombustible * semanasPorMes);
+      const costeMensual2 = cuota2 + ((Math.max(0, cargasSemana - cargasGratis) * consumoElectrico * precioKwh * (kmsSemana / cargasSemana)) * semanasPorMes);
+
+      const ahorro = costeMensual1 - costeMensual2;
+      const kmsMensuales = kmsSemana * semanasPorMes;
+
+      document.getElementById('pagina1').classList.add('hidden');
+      document.getElementById('pagina2').classList.remove('hidden');
+
+      document.getElementById('resKmsMensuales').textContent = kmsMensuales.toFixed(2);
+      document.getElementById('resAhorro').textContent = `€${ahorro.toFixed(2)}`;
+
+      document.getElementById('resModelo1').textContent = `${modelo1} ${acabado1} ${motor1}`;
+      document.getElementById('resCuota1').textContent = `€${cuota1.toFixed(2)}`;
+      document.getElementById('resCosto1').textContent = `€${costeMensual1.toFixed(2)}`;
+      document.getElementById('resTCO1').textContent = `€${costeMensual1.toFixed(2)}`;
+
+      document.getElementById('resModelo2').textContent = `${modelo2} ${acabado2} ${motor2}`;
+      document.getElementById('resCuota2').textContent = `€${cuota2.toFixed(2)}`;
+      document.getElementById('resCosto2').textContent = `€${costeMensual2.toFixed(2)}`;
+      document.getElementById('resTCO2').textContent = `€${costeMensual2.toFixed(2)}`;
+
+      document.getElementById('resKmsICE1').textContent = (kmsSemana * semanasPorMes).toFixed(2);
+      document.getElementById('resKmsBEV1').textContent = (kmsSemana * semanasPorMes).toFixed(2);
+      document.getElementById('resPrecioElect1').textContent = `€${precioKwh.toFixed(2)}`;
+      document.getElementById('resPrecioComb1').textContent = `€${precioCombustible.toFixed(2)}`;
+      document.getElementById('resCostoComb1').textContent = `€${(kmsSemana * consumoCombustible * precioCombustible * semanasPorMes).toFixed(2)}`;
+      document.getElementById('resCostoElect1').textContent = `€${((Math.max(0, cargasSemana - cargasGratis) * consumoElectrico * precioKwh * (kmsSemana / cargasSemana)) * semanasPorMes).toFixed(2)}`;
+
+      document.getElementById('resKmsICE2').textContent = (kmsSemana * semanasPorMes).toFixed(2);
+      document.getElementById('resKmsBEV2').textContent = (kmsSemana * semanasPorMes).toFixed(2);
+      document.getElementById('resPrecioElect2').textContent = `€${precioKwh.toFixed(2)}`;
+      document.getElementById('resPrecioComb2').textContent = `€${precioCombustible.toFixed(2)}`;
+      document.getElementById('resCostoComb2').textContent = `€${(kmsSemana * consumoCombustible * precioCombustible * semanasPorMes).toFixed(2)}`;
+      document.getElementById('resCostoElect2').textContent = `€${((Math.max(0, cargasSemana - cargasGratis) * consumoElectrico * precioKwh * (kmsSemana / cargasSemana)) * semanasPorMes).toFixed(2)}`;
+    });
+  </script>
+
+<script>
+  async function cargarModelosDesdeGoogleSheet() {
+    const url = "https://spreadsheets.google.com/feeds/list/161vk0GiDZHXEsXMIQjxvTEKUi4NSQwSV/1/public/values?alt=json";
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      const entries = data.feed.entry;
+
+      const modelos = new Set();
+
+      entries.forEach(entry => {
+        modelos.add(entry.gsx$modelo.$t);
+      });
+
+      function llenarSelect(id, valores) {
+        const select = document.getElementById(id);
+        valores.forEach(valor => {
+          const option = document.createElement("option");
+          option.value = valor;
+          option.textContent = valor;
+          select.appendChild(option);
+        });
+      }
+
+      llenarSelect("modelo1", modelos);
+      llenarSelect("modelo2", modelos);
+
+    } catch (error) {
+      console.error("Error al cargar datos desde Google Sheets:", error);
+    }
+  }
+
+  window.addEventListener("DOMContentLoaded", cargarModelosDesdeGoogleSheet);
+</script>
+
+<script>
+async function cargarModelosDesdeJSON() {
+  try {
+    const response = await fetch('modelos.json');
+    const data = await response.json();
+
+    const modelos = new Set();
+    const acabados = new Set();
+    const motores = new Set();
+
+    data.forEach(entry => {
+      modelos.add(entry.Modelo);
+      acabados.add(entry.Acabado);
+      motores.add(entry.Motor);
+    });
+
+    function llenarSelect(id, valores) {
+      const select = document.getElementById(id);
+      valores.forEach(valor => {
+        const option = document.createElement("option");
+        option.value = valor;
+        option.textContent = valor;
+        select.appendChild(option);
+      });
+    }
+
+    llenarSelect("modelo1", modelos);
+    llenarSelect("modelo2", modelos);
+    llenarSelect("acabado1", acabados);
+    llenarSelect("acabado2", acabados);
+    llenarSelect("motor1", motores);
+    llenarSelect("motor2", motores);
+  } catch (error) {
+    console.error("Error al cargar datos desde JSON:", error);
+  }
+}
+
+window.addEventListener("DOMContentLoaded", cargarModelosDesdeJSON);
+</script>
+</body>
+</html>
